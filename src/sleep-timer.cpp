@@ -18,6 +18,7 @@ void turnAllOff();
 int resetAll(String command);
 int setTimerPeriod(String periodString);
 int setTimerEndTimestamp(String timestampString);
+int getCurrentPercentage ();
 int checkTimeUpdateLights();
 int getTimeRemaining();
 String getState();
@@ -81,14 +82,24 @@ int setTimerEndTimestamp(String timestampString) {
   }
 }
 
+// get the current time vs start and end time as a percentage of completion
+int getCurrentPercentage () {
+  if (startTime == 0 && endTime == 0) return 0;
+  int currentTime = Time.now();
+  // usually gets caught before as showing the 100% currently clears timer
+  if (currentTime > endTime) return 100;
+  int currentPercentage = (int)((((double)currentTime - (double)startTime) / ((double)endTime - (double)startTime)) * 100.00);
+  return currentPercentage;
+}
+
 // check the current timer state and update lights accordingly
 int checkTimeUpdateLights() {
-  int currentTime = Time.now();
-  int currentPercentage = (int)((((double)currentTime - (double)startTime) / ((double)endTime - (double)startTime)) * 100.00);
+  int currentPercentage = getCurrentPercentage();
   turnAllOff();
   if (currentPercentage >= 100) {
     digitalWrite(led1, HIGH);
     resetTimer();
+    // TODO publish event that we have completed
     return 1;
   }
   if (currentPercentage > 75) {
@@ -128,7 +139,9 @@ void setup() {
   Particle.function("setEnd", setTimerEndTimestamp);
   Particle.function("setPeriod", setTimerPeriod);
   Particle.function("reset", resetAll);
+  // TODO, can we somehow get all of these to return in a single value?
   Particle.variable("timeRemaining", getTimeRemaining);
+  Particle.variable("percentage", getCurrentPercentage);
   Particle.variable("state", getState);
 }
 
