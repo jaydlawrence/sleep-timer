@@ -14,6 +14,7 @@ int led4 = D3; // 25% pin
 int led5 = D4; // 0% pin
 int startTime = 0;
 int endTime = 0;
+char fullState[200];
 
 // reset timer
 void  resetTimer() {
@@ -103,9 +104,21 @@ int getTimeRemaining() {
   return endTime - currentTime;
 }
 
-String getState() {
+char* getState() {
   if (endTime > 0) return "timing";
   return "idle";
+}
+
+void getFullState() {
+  sprintf(
+    fullState,
+    "{\"state\": \"%s\", \"startTime\": %d, \"endTime\": %d, \"timeRemaining\": %d, \"percentageComplete\": %d}",
+    getState(),
+    startTime,
+    endTime,
+    getTimeRemaining(),
+    getCurrentPercentage()
+  );
 }
 
 
@@ -121,10 +134,9 @@ void setup() {
   Particle.function("setEnd", setTimerEndTimestamp);
   Particle.function("setPeriod", setTimerPeriod);
   Particle.function("reset", resetAll);
-  // TODO, can we somehow get all of these to return in a single value?
-  Particle.variable("timeRemaining", getTimeRemaining);
-  Particle.variable("percentage", getCurrentPercentage);
-  Particle.variable("state", getState);
+
+  //variables wrapped into single json
+  Particle.variable("state", fullState);
 }
 
 
@@ -132,5 +144,6 @@ void loop() {
   if(startTime > 0 && endTime > 0) {
     checkTimeUpdateLights();
   }
-  delay(1000);
+  getFullState();
+  delay(500);
 }
