@@ -6,7 +6,6 @@
  * OS version: 1.5.2+
  */
 
-
 int led1 = D0; // Done pin
 int led2 = D1; // 75% pin
 int led3 = D2; // 50% pin
@@ -17,13 +16,15 @@ int endTime = 0;
 char fullState[200];
 
 // reset timer
-void  resetTimer() {
+void resetTimer()
+{
   startTime = 0;
   endTime = 0;
 }
 
 // turn off all LEDs
-void turnAllOff() {
+void turnAllOff()
+{
   digitalWrite(led1, LOW);
   digitalWrite(led2, LOW);
   digitalWrite(led3, LOW);
@@ -32,97 +33,123 @@ void turnAllOff() {
 }
 
 // reset state
-int resetAll(String command) {
+int resetAll(String command)
+{
   resetTimer();
   turnAllOff();
   return 1;
 }
 
 //set time end to now plus passed seconds
-int setTimerPeriod(String periodString) {
+int setTimerPeriod(String periodString)
+{
   int period = periodString.toInt();
-  if (period > 0) {
+  if (period > 0)
+  {
     startTime = Time.now();
     endTime = startTime + period;
     turnAllOff();
     return checkTimeUpdateLights();
-  } else {
+  }
+  else
+  {
     return -1;
   }
 }
 
 //set time end to passed timestamp
-int setTimerEndTimestamp(String timestampString) {
+int setTimerEndTimestamp(String timestampString)
+{
   int timestamp = timestampString.toInt();
   int start = Time.now();
-  if (timestamp > start) {
+  if (timestamp > start)
+  {
     startTime = start;
     endTime = timestamp;
     turnAllOff();
     return checkTimeUpdateLights();
-  } else {
+  }
+  else
+  {
     return -1;
   }
 }
 
 // get the current time vs start and end time as a percentage of completion
-int getCurrentPercentage () {
-  if (startTime == 0 && endTime == 0) return 0;
+int getCurrentPercentage()
+{
+  if (startTime == 0 && endTime == 0)
+    return 0;
   int currentTime = Time.now();
-  // usually gets caught before as showing the 100% currently clears timer
-  if (currentTime > endTime) return 100;
+  if (currentTime > endTime)
+    return 100;
   int currentPercentage = (int)((((double)currentTime - (double)startTime) / ((double)endTime - (double)startTime)) * 100.00);
   return currentPercentage;
 }
 
 // check the current timer state and update lights accordingly
-int checkTimeUpdateLights() {
+int checkTimeUpdateLights()
+{
   int currentPercentage = getCurrentPercentage();
   turnAllOff();
-  if (currentPercentage >= 100) {
+  if (currentPercentage >= 100)
+  {
     digitalWrite(led1, HIGH);
-    resetTimer();
     // TODO publish event that we have completed
     return 1;
   }
-  if (currentPercentage > 75) {
+  if (currentPercentage > 75)
+  {
     digitalWrite(led2, HIGH);
   }
-  if (currentPercentage > 50) {
+  if (currentPercentage > 50)
+  {
     digitalWrite(led3, HIGH);
   }
-  if (currentPercentage > 25) {
+  if (currentPercentage > 25)
+  {
     digitalWrite(led4, HIGH);
   }
   digitalWrite(led5, HIGH);
   return 1;
 }
 
-int getTimeRemaining() {
-  if ( endTime == 0 ) return -1;
+int getTimeRemaining()
+{
+  if (endTime == 0)
+    return -1;
   int currentTime = Time.now();
   return endTime - currentTime;
 }
 
-char* getState() {
-  if (endTime > 0) return "timing";
-  return "idle";
+char *getState()
+{
+  // If no start or end time is set, then device is idle/ready
+  if (endTime == 0 || startTime == 0)
+    return "Ready";
+
+  // if we are passed the endTime is passed, then device is Done
+  if (Time.now() >= endTime)
+    return "Done";
+
+  // Otherwise we are busy timing
+  return "Timing";
 }
 
-void getFullState() {
+void getFullState()
+{
   sprintf(
-    fullState,
-    "{\"state\": \"%s\", \"startTime\": %d, \"endTime\": %d, \"timeRemaining\": %d, \"percentageComplete\": %d}",
-    getState(),
-    startTime,
-    endTime,
-    getTimeRemaining(),
-    getCurrentPercentage()
-  );
+      fullState,
+      "{\"state\": \"%s\", \"startTime\": %d, \"endTime\": %d, \"timeRemaining\": %d, \"percentageComplete\": %d}",
+      getState(),
+      startTime,
+      endTime,
+      getTimeRemaining(),
+      getCurrentPercentage());
 }
 
-
-void setup() {
+void setup()
+{
   // pin modes
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
@@ -139,9 +166,10 @@ void setup() {
   Particle.variable("state", fullState);
 }
 
-
-void loop() {
-  if(startTime > 0 && endTime > 0) {
+void loop()
+{
+  if (startTime > 0 && endTime > 0)
+  {
     checkTimeUpdateLights();
   }
   getFullState();
