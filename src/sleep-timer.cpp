@@ -16,6 +16,7 @@ void resetTimer();
 void turnAllOff();
 int resetAll(String command);
 int setTimerPeriod(String periodString);
+int setWakeNow(String command);
 int setTimerEndTimestamp(String timestampString);
 int getCurrentPercentage();
 int checkTimeUpdateLights();
@@ -74,6 +75,16 @@ int setTimerPeriod(String periodString)
   {
     return -1;
   }
+}
+
+//set time end to now
+int setWakeNow(String command)
+{
+  int end = Time.now();
+  startTime = end - 2;
+  endTime = end - 1;
+  turnAllOff();
+  return checkTimeUpdateLights();
 }
 
 //set time end to passed timestamp
@@ -179,6 +190,7 @@ void setup()
   // cloud functions
   Particle.function("setEnd", setTimerEndTimestamp);
   Particle.function("setPeriod", setTimerPeriod);
+  Particle.function("setWakeNow", setWakeNow);
   Particle.function("reset", resetAll);
 
   //variables wrapped into single json
@@ -192,5 +204,5 @@ void loop()
     checkTimeUpdateLights();
   }
   getFullState();
-  delay(500);
+  delay(100);
 }
