@@ -6,11 +6,13 @@
  * OS version: 1.5.2+
  */
 
-int led1 = D0; // Done pin
-int led2 = D1; // 75% pin
-int led3 = D2; // 50% pin
-int led4 = D3; // 25% pin
-int led5 = D4; // 0% pin
+int moon = D0;  // 0% pin
+int star1 = D1; // 0% pin
+int star2 = D2; // 20% pin
+int star3 = D3; // 40% pin
+int star4 = D4; // 60% pin
+int star5 = D5; // 80% pin
+int sun = D6;   // done pin
 int startTime = 0;
 int endTime = 0;
 char fullState[200];
@@ -25,11 +27,13 @@ void resetTimer()
 // turn off all LEDs
 void turnAllOff()
 {
-  digitalWrite(led1, LOW);
-  digitalWrite(led2, LOW);
-  digitalWrite(led3, LOW);
-  digitalWrite(led4, LOW);
-  digitalWrite(led5, LOW);
+  digitalWrite(moon, LOW);
+  digitalWrite(star1, LOW);
+  digitalWrite(star2, LOW);
+  digitalWrite(star3, LOW);
+  digitalWrite(star4, LOW);
+  digitalWrite(star5, LOW);
+  digitalWrite(sun, LOW);
 }
 
 // reset state
@@ -104,23 +108,28 @@ int checkTimeUpdateLights()
   turnAllOff();
   if (currentPercentage >= 100)
   {
-    digitalWrite(led1, HIGH);
+    digitalWrite(sun, HIGH);
     // TODO publish event that we have completed
     return 1;
   }
-  if (currentPercentage > 75)
+  if (currentPercentage > 80)
   {
-    digitalWrite(led2, HIGH);
+    digitalWrite(star5, HIGH);
   }
-  if (currentPercentage > 50)
+  if (currentPercentage > 60)
   {
-    digitalWrite(led3, HIGH);
+    digitalWrite(star4, HIGH);
   }
-  if (currentPercentage > 25)
+  if (currentPercentage > 40)
   {
-    digitalWrite(led4, HIGH);
+    digitalWrite(star3, HIGH);
   }
-  digitalWrite(led5, HIGH);
+  if (currentPercentage > 20)
+  {
+    digitalWrite(star2, HIGH);
+  }
+  digitalWrite(star1, HIGH);
+  digitalWrite(moon, HIGH);
   return 1;
 }
 
@@ -161,11 +170,13 @@ void getFullState()
 void setup()
 {
   // pin modes
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(led3, OUTPUT);
-  pinMode(led4, OUTPUT);
-  pinMode(led5, OUTPUT);
+  pinMode(moon, OUTPUT);
+  pinMode(star1, OUTPUT);
+  pinMode(star2, OUTPUT);
+  pinMode(star3, OUTPUT);
+  pinMode(star4, OUTPUT);
+  pinMode(star5, OUTPUT);
+  pinMode(sun, OUTPUT);
 
   // cloud functions
   Particle.function("setEnd", setTimerEndTimestamp);
