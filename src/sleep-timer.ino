@@ -133,6 +133,7 @@ int checkTimeUpdateLights()
   return 1;
 }
 
+// get the remaining seconds until endTime
 int getTimeRemaining()
 {
   if (endTime == 0)
@@ -141,6 +142,7 @@ int getTimeRemaining()
   return endTime - currentTime;
 }
 
+// get the current state
 char *getState()
 {
   // If no start or end time is set, then device is idle/ready
@@ -155,6 +157,7 @@ char *getState()
   return "Timing";
 }
 
+// create a JSON style string of the full state data and save it to variable
 void getFullState()
 {
   sprintf(

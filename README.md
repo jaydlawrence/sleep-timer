@@ -49,3 +49,5 @@ The downside is the more LEDs are on, the less bright each LED will be, but in p
 ![Wiring diagram](https://github.com/jaydlawrence/sleep-timer/blob/master/media/board-layout.png)
 
 From there you can add it to a container of some sort.
+
+See [my blog post](https://jaydlawrence.dev/sleep-timer-iot-sleep-training-app/) to see how I set mine up.
